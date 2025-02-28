@@ -1,38 +1,44 @@
-
-#include "WiFi.h"
+// -----------------------------------------------------------------
+// -----Librarys-----
+#include "freertos/FreeRTOSConfig.h"
+#include "freertos/FreeRTOS.h"
 #include "ArduinoJson.h"
 #include "HTTPClient.h"
 #include <UrlEncode.h>
+#include "WiFi.h"
+#include "defs.h"
 
-#define LED 35
-
+// -----------------------------------------------------------------
+// -----Object-----
 HTTPClient http;
 
-const char *ssid = "your SSID";   
-const char *pass = "your wifi password";
+const char* ssid  = SSID;
+const char* pass  = PASS;
 
-String Payload = "";
-String PhoneNumber = "Tour phone";
-String ApiKey = "your api"; //from CallMeBot
+String Payload    = "";
+String Phone      = PhoneNumber;
+String CallMeApi  = CallMeBotApiKey;
 
+// -----------------------------------------------------------------
+// -----Read BTC price----
 void Read_Price(const String& stockname){
-  String RequestAdress = "https://finnhub.io/api/v1/quote?symbol=" + stockname + "&token=cv0k499r01qo8ssh96g0cv0k499r01qo8ssh96gg";
+  String RequestAdress = "https://finnhub.io/api/v1/quote?symbol=" + stockname + 
+                              "&token=cv0k499r01qo8ssh96g0cv0k499r01qo8ssh96gg";
   int httpcode;
   http.begin(RequestAdress);
-  delay(10);
   httpcode = http.GET();
-  delay(10);
+
   if (httpcode > 0){
     DynamicJsonDocument doc(1024);
     String payload = http.getString();
     //Serial.println(payload);
     deserializeJson(doc, payload);
 
-    float ClosePrice = doc["pc"];
-    float CurrentPrice = doc["c"];
+    float ClosePrice        = doc["pc"];
+    float CurrentPrice      = doc["c"];
     float DifferenceInPrice = ((CurrentPrice - ClosePrice) / ClosePrice) * 100.0;
 
-    if(DifferenceInPrice > 5.0 || DifferenceInPrice < 5.0){
+    if(DifferenceInPrice > 10.0 || DifferenceInPrice < -9.9){
       char message[32];
       sprintf(message, "Btc price: %f \n Variation: %f%%", CurrentPrice, DifferenceInPrice);
       Send_Message(message);
@@ -41,12 +47,14 @@ void Read_Price(const String& stockname){
   }else{
     Serial.println("Erro in HTTP request");
   }
-  delay(10);
   http.end();
 }
 
+// -----------------------------------------------------------------
+// -----Sendo info to whatsapp-----
 void Send_Message(String message){
-  String url = "https://api.callmebot.com/whatsapp.php?phone=" + PhoneNumber + "&apikey=" + ApiKey + "&text=" + urlEncode(message);
+  String url = "https://api.callmebot.com/whatsapp.php?phone=" + Phone + "&apikey=" +
+                                           CallMeApi + "&text=" + urlEncode(message);
   http.begin(url);
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -62,6 +70,9 @@ void Send_Message(String message){
   http.end();
 }
 
+
+// -----------------------------------------------------------------
+// -----setup-----
 void setup(){
   Serial.begin(115200);
   WiFi.begin(ssid, pass);
@@ -71,11 +82,11 @@ void setup(){
     WiFi.begin(ssid, pass);
     delay(1000);
   }
-
 }
 
-
-void loop(){
+// -----------------------------------------------------------------
+// -----loop-----
+void loop() {
   Read_Price("BINANCE:BTCUSDT");
-  delay(5000);
+  delay(900000);
 }
