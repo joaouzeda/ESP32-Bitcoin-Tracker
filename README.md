@@ -5,13 +5,12 @@
 The ESP32 connects to the Finnhub(https://finnhub.io/dashboard) API to fetch the Bitcoin price and its variation, 
 then connects to the API, CallMeBot(https://www.callmebot.com/blog/free-api-whatsapp-messages/), responsible for sending the message on your WhatsApp and sends it when the variation is ±10%.
 
-The phone number, CallMeBot API, Wi-Fi name, and password information are in the "defs.h" file.
+The phone number, CallMeBot API Key, Wi-Fi name, and password information are in the "defs.h" file.
 
 <h2 align="center"> Project Features </h2>
 
 1. Read the courrent price of Bitcoin
 2. Send an WhatsApp message with the price of Bitcoin and the variation
-
 
 <h2 align="center">Technologies Used </h2>
 1. Finhub API <br/>
