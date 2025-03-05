@@ -103,7 +103,7 @@ void Read_Price(const String& stockname){
     float CurrentPrice = doc["c"];
     float DifferenceInPrice = ((CurrentPrice - ClosePrice) / ClosePrice) * 100.0;
 
-    if(DifferenceInPrice >= 5.0 || DifferenceInPrice <= 5.0){
+    if(DifferenceInPrice >= 5.0 || DifferenceInPrice <= -5.0){
       char message[32];
       sprintf(message, "Btc price: %.2f \nVariation: %.2f%%", CurrentPrice, DifferenceInPrice);
       Send_Message(message);
